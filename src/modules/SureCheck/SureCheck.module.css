@@ -1,0 +1,421 @@
+.sureCheck {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+  animation: fadeUp 280ms var(--ease) both;
+  background: color-mix(in srgb, var(--module-tint, transparent) 100%, var(--bg-base));
+  min-height: 100%;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Module Header ────────────────────────────────────────── */
+.moduleHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.moduleIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: rgba(0, 180, 160, 0.12);
+  color: #00B4A0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,180,160,0.2);
+}
+
+.moduleTitle {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+  letter-spacing: 0.3px;
+}
+
+.moduleSub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.offlineBadge {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: rgba(222, 53, 11, 0.1);
+  border: 1px solid rgba(222, 53, 11, 0.25);
+  border-radius: var(--radius-full);
+  color: #DE350B;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ── Time Display ─────────────────────────────────────────── */
+.timeDisplay {
+  background: var(--navy);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255,215,0,0.12);
+  border-left: 4px solid var(--module-accent, #00B4A0);
+}
+
+.clockTime {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.clockDate {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 6px;
+}
+
+/* ── Section ──────────────────────────────────────────────── */
+.section {
+  margin-bottom: 20px;
+}
+
+.sectionLabel {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.fenceWarning {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--error);
+  background: var(--error-bg);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(222,53,11,0.15);
+  line-height: 1.5;
+}
+
+/* ── CTA Area ─────────────────────────────────────────────── */
+.ctaArea {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── Punch In Button ──────────────────────────────────────── */
+.punchBtn {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  padding: 20px 32px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #00B4A0 0%, #008F7D 100%);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  overflow: hidden;
+  transition: all var(--t-base) var(--ease-spring);
+  box-shadow: 0 8px 24px rgba(0, 180, 160, 0.35), 0 2px 8px rgba(0,0,0,0.15);
+  border: none;
+}
+
+.punchBtn:hover:not(.punchBtnDisabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(0, 180, 160, 0.45), 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.punchBtn:active:not(.punchBtnDisabled) {
+  transform: translateY(1px);
+  box-shadow: 0 4px 12px rgba(0, 180, 160, 0.25);
+}
+
+.punchBtnDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #8A9BA8 0%, #6B7C88 100%);
+  box-shadow: none;
+}
+
+.punchBtnRipple {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.punchBtnContent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.punchBtnSub {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.75;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+}
+
+/* ── Instruction Text ─────────────────────────────────────── */
+.instructionText {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 8px 16px;
+  background: var(--bg-overlay);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border);
+}
+
+/* ── Submit Button ────────────────────────────────────────── */
+.submitBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 340px;
+  padding: 16px 28px;
+  border-radius: var(--radius-lg);
+  background: var(--navy);
+  color: var(--yellow);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  justify-content: center;
+  transition: all var(--t-base) var(--ease);
+  box-shadow: var(--shadow-md);
+  border: 2px solid rgba(255,215,0,0.2);
+}
+
+.submitBtn:hover {
+  background: var(--navy-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(255,215,0,0.4);
+}
+
+/* ── Info Footer ──────────────────────────────────────────── */
+.infoFooter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Result / Terminal Screens
+══════════════════════════════════════════════════════════ */
+.resultScreen {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  animation: fadeUp 300ms var(--ease) both;
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00875A, #00B4A0);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 12px rgba(0,180,160,0.12), 0 0 0 24px rgba(0,180,160,0.05);
+  animation: popIn 500ms var(--ease-spring) both;
+}
+
+.draftIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF991F, #D97706);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 12px rgba(217,119,6,0.12);
+  animation: popIn 500ms var(--ease-spring) both;
+}
+
+.errorIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #DE350B, #B91C1C);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 12px rgba(220,38,38,0.12);
+  animation: popIn 500ms var(--ease-spring) both;
+}
+
+@keyframes popIn {
+  0%   { transform: scale(0.5); opacity: 0; }
+  70%  { transform: scale(1.08); }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+.resultTitle {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.resultSub {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+.resultMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 300px;
+}
+
+.resultMeta span {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.draftId {
+  font-size: 10px;
+  font-family: monospace;
+  color: var(--text-muted);
+  background: var(--bg-overlay);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.doneBtn, .retryBtn {
+  margin-top: 8px;
+  padding: 12px 36px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  background: var(--navy);
+  color: var(--yellow);
+  border: none;
+  transition: all var(--t-fast) var(--ease);
+  box-shadow: var(--shadow-md);
+}
+
+.doneBtn:hover, .retryBtn:hover {
+  background: var(--navy-light);
+  transform: translateY(-1px);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Upload Screen
+══════════════════════════════════════════════════════════ */
+.uploadingScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-height: 320px;
+  padding: 40px 24px;
+  animation: fadeUp 220ms var(--ease) both;
+}
+
+.uploadRing {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.progressRing {
+  width: 120px;
+  height: 120px;
+  transform: rotate(-90deg);
+}
+
+.trackCircle {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 6;
+}
+
+.fillCircle {
+  fill: none;
+  stroke: #00B4A0;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 200ms var(--ease);
+}
+
+.uploadPct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.uploadLabel {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.uploadSub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: -8px;
+}

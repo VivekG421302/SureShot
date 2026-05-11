@@ -1,0 +1,271 @@
+.cameraBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ── Idle Frame ───────────────────────────────────────────── */
+.idleFrame {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 280px;
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--border-strong);
+  background: var(--bg-overlay);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+}
+
+.idleIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.idleText {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.idleSub {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.loadingRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--module-accent, var(--yellow));
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.startBtn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  background: var(--module-accent, var(--yellow));
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  transition: all var(--t-fast) var(--ease);
+  margin-top: 4px;
+}
+
+.startBtn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.startBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Camera Error ─────────────────────────────────────────── */
+.cameraError {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.errorText {
+  font-size: 12px;
+  color: var(--error);
+  text-align: center;
+  max-width: 240px;
+  line-height: 1.5;
+}
+
+/* ── Captured Frame ───────────────────────────────────────── */
+.capturedFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 280px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 2px solid rgba(0, 180, 160, 0.4);
+  box-shadow: 0 0 0 4px rgba(0, 180, 160, 0.1);
+  animation: captureSnap 300ms var(--ease-spring) both;
+}
+
+@keyframes captureSnap {
+  0%   { transform: scale(0.97); opacity: 0.8; }
+  60%  { transform: scale(1.01); }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+.capturedImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.capturedBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0,180,160,0.9);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(4px);
+}
+
+.retakeBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.retakeBtn:hover { background: var(--bg-overlay); color: var(--text-primary); }
+
+/* ── Live Frame ───────────────────────────────────────────── */
+.liveFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 280px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #000;
+  border: 2px solid var(--module-accent, var(--yellow));
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* Mirror preview */
+}
+
+/* Corner targeting guides */
+.corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: var(--yellow);
+  border-style: solid;
+  z-index: 2;
+  opacity: 0.8;
+}
+
+.tl { top: 12px; left: 12px;  border-width: 2px 0 0 2px; border-radius: 3px 0 0 0; }
+.tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; border-radius: 0 3px 0 0; }
+.bl { bottom: 12px; left: 12px;  border-width: 0 0 2px 2px; border-radius: 0 0 0 3px; }
+.br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; border-radius: 0 0 3px 0; }
+
+.liveBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(220, 38, 38, 0.85);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  z-index: 2;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  animation: blink 1.2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ── Shutter Button ───────────────────────────────────────── */
+.captureBtn {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: transform var(--t-fast) var(--ease-spring);
+}
+
+.captureBtn:hover  { transform: scale(1.05); }
+.captureBtn:active { transform: scale(0.94); }
+
+.captureRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--module-accent, var(--yellow));
+  opacity: 0.7;
+}
+
+.captureCore {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--module-accent, var(--yellow));
+  display: block;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--module-accent, var(--yellow)) 40%, transparent);
+  transition: background var(--t-fast);
+}
+
+.captureBtn:hover .captureCore {
+  background: color-mix(in srgb, var(--module-accent, var(--yellow)) 85%, white);
+}
+
+.captureHint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: -4px;
+}
