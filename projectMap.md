@@ -7,126 +7,134 @@ This file is a quick guide to the project structure and app flow. Use it as the 
 ```text
 sureshot/
 |
-|-- 2D. package.json
-|   `-- Scripts and dependencies:
-|       |-- npm run dev      -> local Vite server
-|       |-- npm run build    -> production bundle
-|       |-- npm run preview  -> preview production bundle
-|       `-- npm run lint     -> lint source files
+├── 2D. package.json
+│   └── Scripts and dependencies
+│       ├── npm run dev      -> local Vite server
+│       ├── npm run build    -> production bundle
+│       ├── npm run preview  -> preview production bundle
+│       └── npm run lint     -> lint source files
 |
-|-- 2C. vite.config.js
-|   `-- Vite + React build/dev-server setup
+├── 2C. vite.config.js
+│   └── Vite + React build/dev-server setup
 |
-|-- 2A. index.html
-|   `-- Browser entry shell
-|       |-- <div id="root">
-|       `-- loads /src/main.jsx
+├── 2A. index.html
+│   └── Browser entry shell
+│       ├── <div id="root">
+│       └── loads /src/main.jsx
 |
-|-- src/
-|   |
-|   |-- 2B. main.jsx
-|   |   `-- React boot point
-|   |       `-- renders <App /> into #root
-|   |
-|   |-- 3A. App.jsx
-|   |   `-- Main app shell
-|   |       |-- wraps app in AppProvider
-|   |       |-- renders Header + Sidebar + main content
-|   |       |-- shows Hub when activeTool is null
-|   |       |-- lazy-loads SureCheck when selected
-|   |       `-- shows global API error toasts
-|   |
-|   |-- 3B. context/
-|   |   `-- AppContext.jsx
-|   |       `-- Shared global state
-|   |           |-- online/offline state
-|   |           |-- active module
-|   |           |-- mock user session
-|   |           |-- light/dark theme
-|   |           |-- draft count
-|   |           `-- API error toast state
-|   |
-|   |-- 4. components/
-|   |   |
-|   |   |-- 4A. Header.jsx
-|   |   |   `-- Top bar: menu, brand, active module, online state, drafts, theme, avatar
-|   |   |
-|   |   |-- 4B. Sidebar.jsx
-|   |   |   `-- Navigation drawer
-|   |   |       |-- MODULE_REGISTRY
-|   |   |       |-- Hub button
-|   |   |       |-- SureCheck available
-|   |   |       `-- SureStock/SureAudit coming soon
-|   |   |
-|   |   `-- 4C. Hub.jsx
-|   |       `-- Home dashboard
-|   |           |-- greeting and site info
-|   |           |-- online/draft/date status strip
-|   |           |-- module cards
-|   |           `-- quick stats placeholders
-|   |
-|   |-- 5. modules/
-|   |   `-- SureCheck/
-|   |       |
-|   |       |-- 5A. SureCheck.jsx
-|   |       |   `-- Attendance state machine
-|   |       |       |-- IDLE          -> show Punch In
-|   |       |       |-- CAPTURING     -> show camera
-|   |       |       |-- REVIEWING     -> show captured selfie
-|   |       |       |-- UPLOADING     -> validate/watermark/upload
-|   |       |       |-- SUCCESS       -> show punch-in success
-|   |       |       |-- DRAFT_SAVED   -> show offline draft saved
-|   |       |       `-- ERROR         -> show failure screen
-|   |       |
-|   |       |-- 5B. GpsStatus.jsx
-|   |       |   `-- Displays GPS loading/error/in-fence/out-of-fence result
-|   |       |
-|   |       |-- 5C. CameraView.jsx
-|   |       |   `-- Displays camera idle/live/captured states
-|   |       |
-|   |       |-- 5D. useGpsFence.js
-|   |       |   `-- Reads browser GPS and checks distance from mock site
-|   |       |
-|   |       `-- 5E. useCamera.js
-|   |           `-- Opens front camera, captures selfie Blob, cleans up MediaStream
-|   |
-|   |-- 6. services/
-|   |   |
-|   |   |-- 6A. api.js
-|   |   |   `-- Central API wrapper
-|   |   |       |-- REST helpers
-|   |   |       |-- timeout handling
-|   |   |       |-- auth header attachment
-|   |   |       |-- global API error event
-|   |   |       `-- upload progress through XMLHttpRequest
-|   |   |
-|   |   `-- 6B. uploader.js
-|   |       `-- Capture upload pipeline
-|   |           |-- validate anti-spoof rules
-|   |           |-- apply watermark on Canvas
-|   |           |-- upload online through api.js
-|   |           `-- save localStorage draft offline/on failure
-|   |
-|   `-- 7. styling files
-|       |-- theme.css
-|       |-- App.module.css
-|       |-- components/*.module.css
-|       `-- modules/SureCheck/*.module.css
-|       `-- Visual styling only; app logic lives in JSX/JS files above
+├── src/
+│   |
+│   ├── 2B. main.jsx
+│   │   └── React boot point
+│   │       └── renders <App /> into #root
+│   |
+│   ├── 3A. App.jsx
+│   │   └── Main app shell
+│   │       ├── wraps app in AppProvider
+│   │       ├── renders Header + Sidebar + main content
+│   │       ├── shows Hub when activeTool is null
+│   │       ├── lazy-loads SureCheck when selected
+│   │       └── shows global API error toasts
+│   |
+│   ├── 3B. context/
+│   │   └── AppContext.jsx
+│   │       └── Shared global state
+│   │           ├── online/offline state
+│   │           ├── active module
+│   │           ├── mock user session
+│   │           ├── light/dark theme
+│   │           ├── draft count
+│   │           └── API error toast state
+│   |
+│   ├── 4. components/
+│   │   |
+│   │   ├── 4A. Header.jsx
+│   │   │   └── Top bar
+│   │   │       ├── menu
+│   │   │       ├── brand
+│   │   │       ├── active module
+│   │   │       ├── online state
+│   │   │       ├── drafts
+│   │   │       ├── theme
+│   │   │       └── avatar
+│   │   |
+│   │   ├── 4B. Sidebar.jsx
+│   │   │   └── Navigation drawer
+│   │   │       ├── MODULE_REGISTRY
+│   │   │       ├── Hub button
+│   │   │       ├── SureCheck available
+│   │   │       └── SureStock/SureAudit coming soon
+│   │   |
+│   │   └── 4C. Hub.jsx
+│   │       └── Home dashboard
+│   │           ├── greeting and site info
+│   │           ├── online/draft/date status strip
+│   │           ├── module cards
+│   │           └── quick stats placeholders
+│   |
+│   ├── 5. modules/
+│   │   └── SureCheck/
+│   │       |
+│   │       ├── 5A. SureCheck.jsx
+│   │       │   └── Attendance state machine
+│   │       │       ├── IDLE          -> show Punch In
+│   │       │       ├── CAPTURING     -> show camera
+│   │       │       ├── REVIEWING     -> show captured selfie
+│   │       │       ├── UPLOADING     -> validate/watermark/upload
+│   │       │       ├── SUCCESS       -> show punch-in success
+│   │       │       ├── DRAFT_SAVED   -> show offline draft saved
+│   │       │       └── ERROR         -> show failure screen
+│   │       |
+│   │       ├── 5B. GpsStatus.jsx
+│   │       │   └── Displays GPS loading/error/in-fence/out-of-fence result
+│   │       |
+│   │       ├── 5C. CameraView.jsx
+│   │       │   └── Displays camera idle/live/captured states
+│   │       |
+│   │       ├── 5D. useGpsFence.js
+│   │       │   └── Reads browser GPS and checks distance from mock site
+│   │       |
+│   │       └── 5E. useCamera.js
+│   │           └── Opens front camera, captures selfie Blob, cleans up MediaStream
+│   |
+│   ├── 6. services/
+│   │   |
+│   │   ├── 6A. api.js
+│   │   │   └── Central API wrapper
+│   │   │       ├── REST helpers
+│   │   │       ├── timeout handling
+│   │   │       ├── auth header attachment
+│   │   │       ├── global API error event
+│   │   │       └── upload progress through XMLHttpRequest
+│   │   |
+│   │   └── 6B. uploader.js
+│   │       └── Capture upload pipeline
+│   │           ├── validate anti-spoof rules
+│   │           ├── apply watermark on Canvas
+│   │           ├── upload online through api.js
+│   │           └── save localStorage draft offline/on failure
+│   |
+│   └── 7. styling files
+│       ├── theme.css
+│       ├── App.module.css
+│       ├── components/*.module.css
+│       ├── modules/SureCheck/*.module.css
+│       └── Visual styling only; app logic lives in JSX/JS files above
 |
-|-- README.md
-|   `-- Short project description / setup notes
+├── README.md
+│   └── Short project description / setup notes
 |
-`-- vercel.json
-    `-- Deployment routing/config for Vercel
+└── vercel.json
+    └── Deployment routing/config for Vercel
+
 
 Runtime flow:
 index.html -> main.jsx -> App.jsx -> AppContext -> Hub
                                       |
-                                      `-> Sidebar selection -> SureCheck
-                                                            |-> useGpsFence -> GpsStatus
-                                                            |-> useCamera   -> CameraView
-                                                            `-> uploader.js -> api.js or localStorage draft
+                                      └── Sidebar selection -> SureCheck
+                                                               ├── useGpsFence -> GpsStatus
+                                                               ├── useCamera   -> CameraView
+                                                               └── uploader.js -> api.js or localStorage draft
 ```
 
 ## 1. Project Purpose
