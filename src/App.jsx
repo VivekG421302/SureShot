@@ -12,6 +12,7 @@ import Hub from './components/Hub.jsx';
 import styles from './App.module.css';
 
 /* ── Lazy-load modules (code-splitting for free-tier perf) ── */
+// 2. Module loading: SureCheck is downloaded only when the user opens it.
 const SureCheck = lazy(() => import('./modules/SureCheck/SureCheck.jsx'));
 
 /* ── Module Renderer ─────────────────────────────────────────
@@ -19,22 +20,27 @@ const SureCheck = lazy(() => import('./modules/SureCheck/SureCheck.jsx'));
    No other file needs changing.
    ─────────────────────────────────────────────────────────── */
 function ModuleRenderer({ toolId }) {
+  // 2A. The active module id from context is translated into the actual React component to show.
   switch (toolId) {
     case 'surecheck': return <SureCheck />;
-    default: return (
-      <div className={styles.notFound}>
-        <p className={styles.notFoundText}>Module "{toolId}" not found.</p>
-      </div>
-    );
+    // 2A(i). If the registry points to a module that is not wired here, show a helpful fallback.
+    default:
+      return (
+        <div className={styles.notFound}>
+          <p className={styles.notFoundText}>Module "{toolId}" not found.</p>
+        </div>
+      );
   }
 }
 
 /* ── Inner Shell (has access to context) ─────────────────── */
 function Shell() {
+  // 3. Shell state: menuOpen is local UI state; activeTool and global app state come from AppContext.
   const [menuOpen, setMenuOpen] = useState(false);
   const { activeTool, setActiveTool, apiErrors, dismissError } = useApp();
 
   const handleNavigate = (module) => {
+    // 3A. Navigation sets the selected module, closes the menu, and resets scroll position.
     setActiveTool(module);
     setMenuOpen(false);
     // Scroll to top on navigation
@@ -43,27 +49,28 @@ function Shell() {
 
   return (
     <div className={styles.shell}>
-      {/* Global Header */}
+      {/* 3B. Header displays brand, active module, network state, drafts, theme toggle, and user initials. */}
       <Header
         onMenuToggle={() => setMenuOpen(o => !o)}
         menuOpen={menuOpen}
       />
 
-      {/* Sidebar Nav */}
+      {/* 3C. Sidebar owns the module menu and calls handleNavigate when the user selects a tool. */}
       <Sidebar
         isOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
         onNavigate={handleNavigate}
       />
 
-      {/* Main Content Area */}
+      {/* 3D. Main content switches between Hub and the active module. */}
       <main className={styles.main}>
-        {/* Module tint overlay */}
+        {/* 3D(i). When inside a module, a tint layer lets CSS theme the background for that module. */}
         {activeTool && (
           <div className={styles.moduleTintLayer} aria-hidden="true" />
         )}
 
         <Suspense fallback={<ModuleLoadingSkeleton />}>
+          {/* 3D(ii). No activeTool means home Hub; otherwise render the selected module. */}
           {activeTool ? (
             <ModuleRenderer toolId={activeTool.id} />
           ) : (
@@ -72,7 +79,7 @@ function Shell() {
         </Suspense>
       </main>
 
-      {/* Global API Error Toasts */}
+      {/* 3E. API service broadcasts errors; the shell renders and dismisses them as global toasts. */}
       {apiErrors.length > 0 && (
         <div className={styles.toastStack} aria-live="polite">
           {apiErrors.map(err => (
@@ -98,6 +105,7 @@ function Shell() {
 
 /* ── Loading Skeleton ─────────────────────────────────────── */
 function ModuleLoadingSkeleton() {
+  // 4. While lazy-loaded module code is downloading, this placeholder preserves the page shape.
   return (
     <div className={styles.skeleton}>
       <div className={`${styles.skLine} ${styles.skTitle}`} />
@@ -111,6 +119,7 @@ function ModuleLoadingSkeleton() {
 
 /* ── Root App ─────────────────────────────────────────────── */
 export default function App() {
+  // 5. Root composition: AppProvider makes global state available to Shell and every module under it.
   return (
     <AppProvider>
       <Shell />

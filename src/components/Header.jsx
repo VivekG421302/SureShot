@@ -2,8 +2,10 @@ import { useApp } from '../context/AppContext.jsx';
 import styles from './Header.module.css';
 
 export default function Header({ onMenuToggle, menuOpen }) {
+  // 7. Header reads shared app state so the top bar always reflects the current module and device state.
   const { activeTool, isOnline, theme, toggleTheme, draftCount, userSession } = useApp();
 
+  // 7A. User initials are derived from the session name and shown when there is no avatar image.
   const initials = userSession.name
     .split(' ')
     .map(n => n[0])
@@ -14,6 +16,7 @@ export default function Header({ onMenuToggle, menuOpen }) {
   return (
     <header className={styles.header}>
       <div className={styles.left}>
+        {/* 7B. Menu button opens/closes the sidebar; App.jsx owns the actual open state. */}
         <button
           className={styles.menuBtn}
           onClick={onMenuToggle}
@@ -27,6 +30,7 @@ export default function Header({ onMenuToggle, menuOpen }) {
           <span className={styles.logoMark}>S</span>
           <div className={styles.logoText}>
             <span className={styles.logoMain}>SureShot</span>
+            {/* 7C. When a module is active, show it beside the SureShot brand. */}
             {activeTool && (
               <>
                 <span className={styles.logoDivider}>›</span>
@@ -38,13 +42,13 @@ export default function Header({ onMenuToggle, menuOpen }) {
       </div>
 
       <div className={styles.right}>
-        {/* Online Status Pill */}
+        {/* 7D. Online status comes from AppContext's browser network listener. */}
         <div className={`${styles.statusPill} ${isOnline ? styles.online : styles.offline}`}>
           <span className={styles.statusDot} />
           <span className={styles.statusText}>{isOnline ? 'Online' : 'Offline'}</span>
         </div>
 
-        {/* Draft Badge */}
+        {/* 7E. Draft badge appears only when offline/failed submissions are waiting in localStorage. */}
         {draftCount > 0 && (
           <div className={styles.draftBadge} title={`${draftCount} pending draft(s)`}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -55,7 +59,7 @@ export default function Header({ onMenuToggle, menuOpen }) {
           </div>
         )}
 
-        {/* Theme Toggle */}
+        {/* 7F. Theme toggle flips AppContext theme, which updates the document's data-theme attribute. */}
         <button
           className={styles.themeBtn}
           onClick={toggleTheme}
@@ -80,7 +84,7 @@ export default function Header({ onMenuToggle, menuOpen }) {
           )}
         </button>
 
-        {/* User Avatar */}
+        {/* 7G. Avatar gives a quick identity check for the currently mocked session. */}
         <div className={styles.avatar} title={`${userSession.name} — ${userSession.role}`}>
           {initials}
         </div>

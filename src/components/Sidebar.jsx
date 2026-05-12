@@ -2,7 +2,8 @@ import { useApp } from '../context/AppContext.jsx';
 import styles from './Sidebar.module.css';
 
 /* ── Module Registry ───────────────────────────────────────── */
-// To add a new module: push one entry here. That's it.
+// 8. Module registry: both Sidebar and Hub read this list to know which tools exist.
+// 8A. To add a new module, add an entry here and wire the matching id in App.jsx's ModuleRenderer.
 export const MODULE_REGISTRY = [
   {
     id: 'surecheck',
@@ -51,34 +52,37 @@ export const MODULE_REGISTRY = [
 ];
 
 export default function Sidebar({ isOpen, onClose, onNavigate }) {
+  // 8B. Sidebar uses global context to highlight the current tool and show user/site status.
   const { activeTool, userSession, isOnline } = useApp();
 
   const handleSelect = (module) => {
+    // 8C. Disabled modules are visible as "coming soon" but cannot navigate.
     if (!module.available) return;
     onNavigate(module);
     onClose();
   };
 
   const handleHome = () => {
+    // 8D. Passing null as the active module returns the user to the Hub.
     onNavigate(null);
     onClose();
   };
 
   return (
     <>
-      {/* Backdrop */}
+      {/* 8E. Backdrop closes the sidebar when the user taps outside the panel. */}
       <div
         className={`${styles.backdrop} ${isOpen ? styles.backdropVisible : ''}`}
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Sidebar Panel */}
+      {/* 8F. Sidebar panel contains user context, home link, module links, and version footer. */}
       <nav
         className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}
         aria-label="Main navigation"
       >
-        {/* User Card */}
+        {/* 8F(i). User card repeats the active worker/site so field users know which account is active. */}
         <div className={styles.userCard}>
           <div className={styles.userAvatar}>
             {userSession.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
@@ -90,9 +94,9 @@ export default function Sidebar({ isOpen, onClose, onNavigate }) {
           <div className={`${styles.onlineDot} ${isOnline ? styles.dotOnline : styles.dotOffline}`} />
         </div>
 
-        {/* Navigation */}
+        {/* 8G. Navigation section contains Hub first, then all registered modules. */}
         <div className={styles.nav}>
-          {/* Hub / Home */}
+          {/* 8G(i). Hub is active when activeTool is null. */}
           <button
             className={`${styles.navItem} ${activeTool === null ? styles.navItemActive : ''}`}
             onClick={handleHome}
@@ -107,12 +111,12 @@ export default function Sidebar({ isOpen, onClose, onNavigate }) {
             <span className={styles.navSub}>Dashboard</span>
           </button>
 
-          {/* Divider */}
+          {/* 8G(ii). Divider separates home navigation from app modules. */}
           <div className={styles.divider}>
             <span>Modules</span>
           </div>
 
-          {/* Module Items */}
+          {/* 8G(iii). Module buttons are generated from MODULE_REGISTRY so Sidebar and Hub stay in sync. */}
           {MODULE_REGISTRY.map(module => (
             <button
               key={module.id}
@@ -141,7 +145,7 @@ export default function Sidebar({ isOpen, onClose, onNavigate }) {
           ))}
         </div>
 
-        {/* Footer */}
+        {/* 8H. Footer is static product/version context. */}
         <div className={styles.sidebarFooter}>
           <span className={styles.version}>SureShot v1.0.0</span>
           <span className={styles.footerDot}>·</span>

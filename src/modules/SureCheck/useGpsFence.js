@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 // Mock site coordinates — in production, fetch from API based on userSession.siteId
+// 16. Mock site coordinates: in production, fetch this from an API based on userSession.siteId.
 const MOCK_SITE = {
   latitude: 19.1218,   // Andheri West, Mumbai (mock)
   longitude: 72.8397,
@@ -18,6 +19,7 @@ const MOCK_SITE = {
  * Haversine formula — returns distance in meters between two lat/lng points.
  */
 function haversineDistance(lat1, lon1, lat2, lon2) {
+  // 16A. Haversine calculates real-world distance between two latitude/longitude points in meters.
   const R = 6371000; // Earth radius in meters
   const toRad = (deg) => (deg * Math.PI) / 180;
   const dLat = toRad(lat2 - lat1);
@@ -41,6 +43,7 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
  * }}
  */
 export function useGpsFence() {
+  // 16B. GPS hook state tracks coordinates, calculated distance, fence result, and loading/errors.
   const [gps, setGps] = useState(null);
   const [distance, setDistance] = useState(null);
   const [withinFence, setWithinFence] = useState(null);
@@ -48,6 +51,7 @@ export function useGpsFence() {
   const [gpsLoading, setGpsLoading] = useState(false);
 
   const fetchPosition = useCallback(() => {
+    // 16C. Browser capability check: geolocation may not exist on every device/browser.
     if (!navigator.geolocation) {
       setGpsError('Geolocation is not supported by this device.');
       return;
@@ -58,6 +62,7 @@ export function useGpsFence() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        // 16C(i). Success path: store coordinates, compute distance to site, and mark in/out of fence.
         const { latitude, longitude, accuracy } = position.coords;
         const coords = { latitude, longitude, accuracy };
         setGps(coords);
@@ -73,6 +78,7 @@ export function useGpsFence() {
         setGpsLoading(false);
       },
       (err) => {
+        // 16C(ii). Failure path: translate browser error codes into user-readable messages.
         let message = 'Could not retrieve location.';
         if (err.code === 1) message = 'Location permission denied. Please enable GPS access.';
         if (err.code === 2) message = 'Location unavailable. Please try again.';
@@ -81,6 +87,7 @@ export function useGpsFence() {
         setGpsLoading(false);
       },
       {
+        // 16C(iii). Options favor fresh, accurate GPS while allowing a short cached position.
         enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 30000,
@@ -88,12 +95,13 @@ export function useGpsFence() {
     );
   }, []);
 
-  // Auto-fetch on mount
+  // 16D. Auto-fetch on mount so the Location Check card is populated as soon as SureCheck opens.
   useEffect(() => {
     fetchPosition();
   }, [fetchPosition]);
 
   return {
+    // 16E. Public GPS API used by SureCheck and GpsStatus.
     gps,
     distance,
     withinFence,

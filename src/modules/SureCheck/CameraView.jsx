@@ -10,8 +10,10 @@ export default function CameraView({
   onCapture,
   onRetake,
 }) {
+  // 13. CameraView is presentational: it renders idle, captured, or live camera UI from hook props.
   /* ── Idle State ────────────────────────────────────────────── */
   if (!isCameraOn && !capturedUrl) {
+    // 13A. Idle state: camera has not started or failed, so the user can open/try again.
     return (
       <div className={styles.cameraBox}>
         <div className={styles.idleFrame}>
@@ -55,6 +57,7 @@ export default function CameraView({
 
   /* ── Captured State ────────────────────────────────────────── */
   if (capturedUrl) {
+    // 13B. Captured state: show the still image preview and allow retake.
     return (
       <div className={styles.cameraBox}>
         <div className={styles.capturedFrame}>
@@ -79,9 +82,10 @@ export default function CameraView({
 
   /* ── Live Camera ───────────────────────────────────────────── */
   return (
+    // 13C. Live state: show the video stream plus shutter button.
     <div className={styles.cameraBox}>
       <div className={styles.liveFrame}>
-        {/* Corner guides */}
+        {/* 13C(i). Corner guides help the user position their face in the frame. */}
         <div className={`${styles.corner} ${styles.tl}`} />
         <div className={`${styles.corner} ${styles.tr}`} />
         <div className={`${styles.corner} ${styles.bl}`} />

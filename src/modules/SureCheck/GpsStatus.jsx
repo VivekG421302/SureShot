@@ -1,7 +1,9 @@
 import styles from './GpsStatus.module.css';
 
 export default function GpsStatus({ gps, distance, withinFence, gpsError, gpsLoading, site, onRefresh }) {
+  // 14. GpsStatus is presentational: it renders loading, error, or geofence result from hook props.
   if (gpsLoading) {
+    // 14A. Loading state appears while the browser is acquiring position.
     return (
       <div className={`${styles.gpsCard} ${styles.loading}`}>
         <div className={styles.spinner} />
@@ -14,6 +16,7 @@ export default function GpsStatus({ gps, distance, withinFence, gpsError, gpsLoa
   }
 
   if (gpsError) {
+    // 14B. Error state explains permission/device/location failures and offers retry.
     return (
       <div className={`${styles.gpsCard} ${styles.error}`}>
         <div className={styles.iconWrap}>
@@ -32,9 +35,10 @@ export default function GpsStatus({ gps, distance, withinFence, gpsError, gpsLoa
     );
   }
 
-  if (!gps) return null;
+  if (!gps) return null; // 14C. No GPS and no error/loading means there is nothing meaningful to show yet.
 
   return (
+    // 14D. Result state shows whether the current coordinates are inside the site radius.
     <div className={`${styles.gpsCard} ${withinFence ? styles.within : styles.outside}`}>
       <div className={styles.iconWrap}>
         {withinFence ? (
@@ -58,7 +62,7 @@ export default function GpsStatus({ gps, distance, withinFence, gpsError, gpsLoa
         </span>
       </div>
 
-      {/* Visual distance indicator */}
+      {/* 14D(i). Visual distance indicator compares current distance against allowed radius. */}
       <div className={styles.distBar}>
         <div
           className={styles.distFill}

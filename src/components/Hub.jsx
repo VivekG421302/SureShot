@@ -3,14 +3,16 @@ import { MODULE_REGISTRY } from './Sidebar.jsx';
 import styles from './Hub.module.css';
 
 export default function Hub({ onNavigate }) {
+  // 9. Hub is the home screen: it summarizes the session and lists available app modules.
   const { userSession, isOnline, draftCount } = useApp();
 
+  // 9A. Greeting is calculated at render time from the user's local clock.
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
 
   return (
     <div className={styles.hub}>
-      {/* Welcome Banner */}
+      {/* 9B. Welcome banner anchors the user in their current account and site. */}
       <div className={styles.banner}>
         <div className={styles.bannerContent}>
           <p className={styles.greeting}>{greeting},</p>
@@ -28,7 +30,7 @@ export default function Hub({ onNavigate }) {
         </div>
       </div>
 
-      {/* Status Strip */}
+      {/* 9C. Status strip shows operational state: connectivity, pending drafts, and today's date. */}
       <div className={styles.statusStrip}>
         <div className={`${styles.statusCard} ${isOnline ? styles.cardOnline : styles.cardOffline}`}>
           <div className={styles.statusDot} />
@@ -54,7 +56,7 @@ export default function Hub({ onNavigate }) {
         </div>
       </div>
 
-      {/* Module Grid */}
+      {/* 9D. Module grid mirrors MODULE_REGISTRY; available cards navigate, unavailable cards stay disabled. */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Your Tools</h2>
         <div className={styles.moduleGrid}>
@@ -91,7 +93,7 @@ export default function Hub({ onNavigate }) {
         </div>
       </section>
 
-      {/* Quick Stats */}
+      {/* 9E. Quick stats are placeholders for future attendance/audit/inventory metrics. */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Today at a Glance</h2>
         <div className={styles.statsGrid}>

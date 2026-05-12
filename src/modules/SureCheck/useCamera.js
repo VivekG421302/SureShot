@@ -7,6 +7,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 
 export function useCamera() {
+  // 15. Camera hook owns all browser camera state and keeps UI components free of MediaStream details.
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
@@ -19,18 +20,19 @@ export function useCamera() {
 
   /* ── Start Camera ─────────────────────────────────────────── */
   const startCamera = useCallback(async () => {
+    // 15A. Start camera: clear old errors, request the front camera, and attach the stream to <video>.
     setCameraError(null);
     setCameraLoading(true);
 
     try {
-      // Stop any existing stream
+      // 15A(i). Stop any existing stream before requesting a fresh one.
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(t => t.stop());
       }
 
       const constraints = {
         video: {
-          facingMode: 'user',   // Front camera enforced (anti-spoofing)
+          facingMode: 'user',   // 15A(ii). Front camera enforced for selfie verification.
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
@@ -62,6 +64,7 @@ export function useCamera() {
 
   /* ── Stop Camera ──────────────────────────────────────────── */
   const stopCamera = useCallback(() => {
+    // 15B. Stop camera: release device tracks and detach the stream from the video element.
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(t => t.stop());
       streamRef.current = null;
@@ -74,6 +77,7 @@ export function useCamera() {
 
   /* ── Capture Selfie ───────────────────────────────────────── */
   const captureSelfie = useCallback(() => {
+    // 15C. Capture selfie: draw the current video frame to canvas and convert it to a JPEG blob.
     if (!videoRef.current || !isCameraOn) return;
 
     const video = videoRef.current;
@@ -82,7 +86,7 @@ export function useCamera() {
     canvas.height = video.videoHeight;
 
     const ctx = canvas.getContext('2d');
-    // Mirror the image (front camera is mirrored in preview but should be unmirrored in capture)
+    // 15C(i). Mirror correction: preview is mirrored, but saved capture should be natural orientation.
     ctx.translate(canvas.width, 0);
     ctx.scale(-1, 1);
     ctx.drawImage(video, 0, 0);
@@ -93,7 +97,7 @@ export function useCamera() {
       (blob) => {
         if (!blob) return;
 
-        // Revoke previous object URL to prevent memory leaks
+        // 15C(ii). Revoke previous object URL to prevent memory leaks.
         if (capturedUrl) URL.revokeObjectURL(capturedUrl);
 
         const url = URL.createObjectURL(blob);
@@ -109,6 +113,7 @@ export function useCamera() {
 
   /* ── Retake ────────────────────────────────────────────────── */
   const retake = useCallback(() => {
+    // 15D. Retake: clear the last capture and immediately reopen the camera.
     if (capturedUrl) {
       URL.revokeObjectURL(capturedUrl);
       setCapturedUrl(null);
@@ -120,6 +125,7 @@ export function useCamera() {
 
   /* ── Cleanup on unmount ───────────────────────────────────── */
   useEffect(() => {
+    // 15E. Cleanup: when SureCheck unmounts, release camera hardware and temporary preview URLs.
     return () => {
       stopCamera();
       if (capturedUrl) URL.revokeObjectURL(capturedUrl);
@@ -128,6 +134,7 @@ export function useCamera() {
   }, []);
 
   return {
+    // 15F. Public camera API used by SureCheck and CameraView.
     videoRef,
     isCameraOn,
     cameraError,

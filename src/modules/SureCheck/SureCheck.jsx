@@ -15,6 +15,7 @@ import styles from './SureCheck.module.css';
 
 /* ── Flow States ───────────────────────────────────────────── */
 const FLOW = {
+  // 12. Flow constants: SureCheck moves through these states from idle to result.
   IDLE: 'idle',
   READY: 'ready',
   CAPTURING: 'capturing',
@@ -26,18 +27,22 @@ const FLOW = {
 };
 
 export default function SureCheck() {
+  // 12A. Global app state supplies online/offline mode, current user/site, and draft count refresh.
   const { isOnline, userSession, refreshDraftCount } = useApp();
 
+  // 12B. Local module state tracks the attendance flow, upload progress, and final result/error.
   const [flow, setFlow] = useState(FLOW.IDLE);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [resultData, setResultData] = useState(null);
   const [uploadError, setUploadError] = useState(null);
 
   const {
+    // 12C. GPS hook checks current position against the configured site fence.
     gps, distance, withinFence, gpsError, gpsLoading, refreshGps, site,
   } = useGpsFence();
 
   const {
+    // 12D. Camera hook owns MediaStream setup, selfie capture, preview URL, and cleanup.
     videoRef, isCameraOn, cameraError, cameraLoading,
     capturedBlob, capturedUrl, captureTimestamp,
     startCamera, captureSelfie, retake,
@@ -49,21 +54,25 @@ export default function SureCheck() {
 
   /* ── Handlers ──────────────────────────────────────────────── */
   const handleStartCapture = useCallback(() => {
+    // 12E. User taps Punch In: move to camera mode and request camera access.
     setFlow(FLOW.CAPTURING);
     startCamera();
   }, [startCamera]);
 
   const handleCaptureSelfie = useCallback(() => {
+    // 12E(i). User taps shutter: capture the image and move to review mode.
     captureSelfie();
     setFlow(FLOW.REVIEWING);
   }, [captureSelfie]);
 
   const handleRetake = useCallback(() => {
+    // 12E(ii). Retake clears the previous capture and starts the camera again.
     retake();
     setFlow(FLOW.CAPTURING);
   }, [retake]);
 
   const handleSubmit = useCallback(async () => {
+    // 12F. Submit starts the upload pipeline: validation, watermark, API upload, or draft save.
     if (!capturedBlob || !captureTimestamp) return;
 
     setFlow(FLOW.UPLOADING);
@@ -88,18 +97,22 @@ export default function SureCheck() {
     refreshDraftCount();
 
     if (result.success) {
+      // 12F(i). Online success: show confirmation with the local punch-in time.
       setResultData({ punchedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) });
       setFlow(FLOW.SUCCESS);
     } else if (result.offline || result.networkError) {
+      // 12F(ii). Offline/network failure: show saved-draft result and refresh the global draft badge.
       setResultData({ draftId: result.draftId });
       setFlow(FLOW.DRAFT_SAVED);
     } else {
+      // 12F(iii). Validation or processing failure: show an actionable error screen.
       setUploadError(result.error || 'Upload failed. Please try again.');
       setFlow(FLOW.ERROR);
     }
   }, [capturedBlob, captureTimestamp, gps, userSession, refreshDraftCount]);
 
   const handleReset = useCallback(() => {
+    // 12G. Reset returns SureCheck to the initial Punch In screen.
     setFlow(FLOW.IDLE);
     setResultData(null);
     setUploadError(null);
@@ -108,6 +121,7 @@ export default function SureCheck() {
 
   /* ── Render: Success ───────────────────────────────────────── */
   if (flow === FLOW.SUCCESS) {
+    // 12H. Result branch: successful upload has been accepted by the server.
     return (
       <div className={styles.resultScreen}>
         <div className={styles.successIcon}>
@@ -134,6 +148,7 @@ export default function SureCheck() {
 
   /* ── Render: Draft Saved ───────────────────────────────────── */
   if (flow === FLOW.DRAFT_SAVED) {
+    // 12I. Result branch: upload could not happen now, but the watermarked capture is saved locally.
     return (
       <div className={styles.resultScreen}>
         <div className={styles.draftIcon}>
@@ -158,6 +173,7 @@ export default function SureCheck() {
 
   /* ── Render: Error ─────────────────────────────────────────── */
   if (flow === FLOW.ERROR) {
+    // 12J. Result branch: show upload/validation failure and let the user restart.
     return (
       <div className={styles.resultScreen}>
         <div className={styles.errorIcon}>
@@ -178,6 +194,7 @@ export default function SureCheck() {
 
   /* ── Render: Uploading ─────────────────────────────────────── */
   if (flow === FLOW.UPLOADING) {
+    // 12K. Upload branch: progress ring reflects the XMLHttpRequest upload callback.
     return (
       <div className={styles.uploadingScreen}>
         <div className={styles.uploadRing}>
@@ -200,8 +217,9 @@ export default function SureCheck() {
 
   /* ── Render: Main Flow ─────────────────────────────────────── */
   return (
+    // 12L. Main branch: location status, optional camera, and the primary action button.
     <div className={styles.sureCheck}>
-      {/* Module Header */}
+      {/* 12L(i). Module header identifies the current tool and offline state. */}
       <div className={styles.moduleHeader}>
         <div className={styles.moduleIcon}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -214,7 +232,7 @@ export default function SureCheck() {
           <h1 className={styles.moduleTitle}>SureCheck</h1>
           <p className={styles.moduleSub}>Field Attendance</p>
         </div>
-        {/* Offline badge */}
+        {/* 12L(ii). Offline badge warns that submission will become a draft. */}
         {!isOnline && (
           <div className={styles.offlineBadge}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -226,12 +244,12 @@ export default function SureCheck() {
         )}
       </div>
 
-      {/* Time Display */}
+      {/* 12L(iii). Live clock makes the attendance moment visible before capture. */}
       <div className={styles.timeDisplay}>
         <LiveClock />
       </div>
 
-      {/* GPS Status */}
+      {/* 12L(iv). GPS status tells the user whether they are inside the allowed site radius. */}
       <div className={styles.section}>
         <label className={styles.sectionLabel}>Location Check</label>
         <GpsStatus
@@ -250,7 +268,7 @@ export default function SureCheck() {
         )}
       </div>
 
-      {/* Camera Section */}
+      {/* 12L(v). Camera appears only while capturing/reviewing or when a photo exists. */}
       {(flow === FLOW.CAPTURING || flow === FLOW.REVIEWING || hasCaptured) && (
         <div className={styles.section}>
           <label className={styles.sectionLabel}>Selfie Verification</label>
@@ -267,7 +285,7 @@ export default function SureCheck() {
         </div>
       )}
 
-      {/* Primary CTA */}
+      {/* 12L(vi). Primary CTA changes based on flow: start, instructions, or confirm submit. */}
       <div className={styles.ctaArea}>
         {flow === FLOW.IDLE && (
           <button
@@ -305,7 +323,7 @@ export default function SureCheck() {
         )}
       </div>
 
-      {/* Info Footer */}
+      {/* 12L(vii). Footer repeats user/site identity for the attendance record context. */}
       <div className={styles.infoFooter}>
         <span>👤 {userSession.name}</span>
         <span>·</span>
@@ -319,6 +337,7 @@ export default function SureCheck() {
 import { useState as useClockState, useEffect as useClockEffect } from 'react';
 
 function LiveClock() {
+  // 12M. LiveClock updates once per second and renders date/time in India locale formatting.
   const [time, setTime] = useClockState(new Date());
 
   useClockEffect(() => {

@@ -21,6 +21,7 @@ const ANTI_SPOOF_MAX_AGE_MS = 30 * 1000; // 30 seconds: capture must be "fresh"
  * @returns {{ valid: boolean, reason?: string }}
  */
 export function validateCapture(imageBlob, captureTimestamp) {
+  // 11. Anti-spoof gate: reject missing, non-image, stale, or suspiciously tiny captures before upload.
   if (!imageBlob || !(imageBlob instanceof Blob)) {
     return { valid: false, reason: 'Invalid image data.' };
   }
@@ -51,18 +52,20 @@ export function validateCapture(imageBlob, captureTimestamp) {
  * @returns {Promise<Blob>} - watermarked image blob
  */
 export async function applyWatermark(imageBlob, gps = null) {
+  // 11A. Watermarking loads the captured blob into an image, draws it to canvas, then exports a new JPEG.
   return new Promise((resolve, reject) => {
     const img = new Image();
     const objectUrl = URL.createObjectURL(imageBlob);
 
     img.onload = () => {
       try {
+        // 11A(i). Canvas starts as a copy of the original camera image.
         const canvas = document.createElement('canvas');
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
         const ctx = canvas.getContext('2d');
 
-        // Draw original image
+        // 11A(ii). Draw original image.
         ctx.drawImage(img, 0, 0);
 
         // ── Watermark Config ────────────────────────────────
@@ -84,38 +87,38 @@ export async function applyWatermark(imageBlob, gps = null) {
           `GPS:  ${gpsStr}`,
         ];
 
-        // Scale font relative to image size for consistent appearance
+        // 11A(iii). Scale font relative to image size for consistent appearance.
         const baseFontSize = Math.max(20, Math.round(canvas.width / 40));
         const padding = Math.round(baseFontSize * 0.7);
         const lineHeight = baseFontSize * 1.5;
         const blockHeight = lines.length * lineHeight + padding * 2;
         const blockY = canvas.height - blockHeight - padding;
 
-        // Semi-transparent dark background strip
+        // 11A(iv). Semi-transparent dark background strip makes the watermark readable.
         ctx.fillStyle = 'rgba(0, 15, 31, 0.72)';
         ctx.fillRect(0, blockY - padding / 2, canvas.width, blockHeight + padding);
 
-        // Yellow accent bar on left
+        // 11A(v). Yellow accent bar brands the verification block.
         ctx.fillStyle = '#FFD700';
         ctx.fillRect(0, blockY - padding / 2, Math.round(baseFontSize * 0.3), blockHeight + padding);
 
-        // Text rendering
+        // 11A(vi). Text rendering writes app name, date, time, and GPS onto the image.
         ctx.font = `600 ${baseFontSize}px 'Barlow Condensed', monospace`;
         ctx.textBaseline = 'top';
 
         lines.forEach((line, i) => {
           const y = blockY + i * lineHeight;
 
-          // Shadow for readability
+          // 11A(vii). Shadow improves readability over bright photos.
           ctx.fillStyle = 'rgba(0,0,0,0.5)';
           ctx.fillText(line, padding + 2, y + 2);
 
-          // Actual text: header line in yellow, rest in white
+          // 11A(viii). Header line is yellow; details are white.
           ctx.fillStyle = i === 0 ? '#FFD700' : '#FFFFFF';
           ctx.fillText(line, padding, y);
         });
 
-        // Cleanup
+        // 11A(ix). Cleanup releases the temporary object URL.
         URL.revokeObjectURL(objectUrl);
 
         canvas.toBlob(
@@ -148,6 +151,7 @@ export async function applyWatermark(imageBlob, gps = null) {
  * @param {{ module: string, payload: object, imageDataUrl: string }} draft
  */
 export function saveDraft(draft) {
+  // 11B. Offline draft save: append a generated id/timestamp and persist the queue in localStorage.
   const queue = getDrafts();
   const entry = {
     id: `draft_${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -160,6 +164,7 @@ export function saveDraft(draft) {
 }
 
 export function getDrafts() {
+  // 11B(i). Draft read: broken JSON falls back to an empty queue so the app can recover.
   try {
     return JSON.parse(localStorage.getItem(DRAFT_QUEUE_KEY) || '[]');
   } catch {
@@ -168,11 +173,13 @@ export function getDrafts() {
 }
 
 export function removeDraft(id) {
+  // 11B(ii). Draft remove: keep every draft except the one that synced or was deleted.
   const queue = getDrafts().filter(d => d.id !== id);
   localStorage.setItem(DRAFT_QUEUE_KEY, JSON.stringify(queue));
 }
 
 export function clearDrafts() {
+  // 11B(iii). Draft clear: used when the whole local queue should be reset.
   localStorage.removeItem(DRAFT_QUEUE_KEY);
 }
 
@@ -206,7 +213,7 @@ export async function uploadCapture({
   onProgress,
   allowOfflineDraft = true,
 }) {
-  // Step 1: Anti-spoof check
+  // 11C. Upload pipeline step 1: anti-spoof validation blocks bad captures before processing.
   const validation = validateCapture(imageBlob, captureTimestamp);
   if (!validation.valid) {
     return { success: false, error: validation.reason };
@@ -214,14 +221,14 @@ export async function uploadCapture({
 
   let watermarkedBlob;
   try {
-    // Step 2: Watermark
+    // 11C(i). Upload pipeline step 2: watermark the image with time and GPS proof.
     watermarkedBlob = await applyWatermark(imageBlob, gps);
   } catch (err) {
     console.error('[Uploader] Watermark failed:', err);
     return { success: false, error: 'Image processing failed. Please try again.' };
   }
 
-  // Step 3: If offline, save draft immediately
+  // 11C(ii). Upload pipeline step 3: if offline, save immediately as a draft instead of failing.
   if (!navigator.onLine) {
     if (!allowOfflineDraft) {
       return { success: false, error: 'You are offline and drafts are not enabled.' };
@@ -232,7 +239,7 @@ export async function uploadCapture({
     return { success: false, offline: true, draftId };
   }
 
-  // Step 4: Build FormData and upload
+  // 11C(iii). Upload pipeline step 4: build multipart FormData for the API upload.
   const formData = new FormData();
   formData.append('image', watermarkedBlob, `sureshot_${Date.now()}.jpg`);
   formData.append('metadata', JSON.stringify({
@@ -242,6 +249,7 @@ export async function uploadCapture({
   }));
 
   try {
+    // 11C(iv). Upload pipeline step 5: send to API and return success data.
     const data = await api.upload(endpoint, formData, onProgress);
     return { success: true, data };
   } catch (err) {
@@ -257,6 +265,7 @@ export async function uploadCapture({
 
 /* ── Helpers ───────────────────────────────────────────────── */
 function blobToDataUrl(blob) {
+  // 11D. Helper: convert a Blob to a data URL so drafts can live inside localStorage.
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
